@@ -21,6 +21,7 @@ sp "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" "DODownloadM
 $objSID = New-Object System.Security.Principal.SecurityIdentifier "S-1-1-0"
 $EveryOne = $objSID.Translate( [System.Security.Principal.NTAccount]).Value
 
+# MusNotification.exe was removed on Windows 11
 if ([Environment]::OSVersion.Version -lt 10.0.22000) {
 	echo "Disable 'Updates are available' message"
 	takeown /F "$env:WinDIR\System32\MusNotification.exe"
