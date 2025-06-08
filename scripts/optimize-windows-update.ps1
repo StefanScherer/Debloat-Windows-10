@@ -2,7 +2,10 @@
 # This script optimizes Windows updates by disabling automatic download and
 # seeding updates to other computers.
 #
-Import-Module -DisableNameChecking $PSScriptRoot\..\lib\force-mkdir.psm1
+
+#TODO: Copy hierarchy to A:\ using `floppy_files`.
+#Import-Module -DisableNameChecking $PSScriptRoot\..\lib\force-mkdir.psm1
+Import-Module -DisableNameChecking 'A:\force-mkdir.psm1'
 
 echo "Disable automatic download and installation of Windows updates"
 force-mkdir "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\WindowsUpdate\AU"
@@ -21,8 +24,11 @@ sp "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" "DODownloadM
 $objSID = New-Object System.Security.Principal.SecurityIdentifier "S-1-1-0"
 $EveryOne = $objSID.Translate( [System.Security.Principal.NTAccount]).Value
 
-echo "Disable 'Updates are available' message"
-takeown /F "$env:WinDIR\System32\MusNotification.exe"
-icacls "$env:WinDIR\System32\MusNotification.exe" /deny "$($EveryOne):(X)"
-takeown /F "$env:WinDIR\System32\MusNotificationUx.exe"
-icacls "$env:WinDIR\System32\MusNotificationUx.exe" /deny "$($EveryOne):(X)"
+# MusNotification.exe was removed on Windows 11
+if ([Environment]::OSVersion.Version -lt 10.0.22000) {
+	echo "Disable 'Updates are available' message"
+	takeown /F "$env:WinDIR\System32\MusNotification.exe"
+	icacls "$env:WinDIR\System32\MusNotification.exe" /deny "$($EveryOne):(X)"
+	takeown /F "$env:WinDIR\System32\MusNotificationUx.exe"
+	icacls "$env:WinDIR\System32\MusNotificationUx.exe" /deny "$($EveryOne):(X)"
+}
